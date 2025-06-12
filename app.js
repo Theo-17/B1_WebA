@@ -167,6 +167,30 @@ io.on('connection', socket => {
   });
 });
 
+// Ruta raíz que redirige al login
+app.get('/', (req, res) => {
+  res.redirect('/login');
+});
+
+// Configuración de sesiones (asegúrate de que ya esté configurado)
+app.use(session({
+  secret: 'vetcare_secret', // Usa el mismo valor que en tu archivo .env
+  resave: false,
+  saveUninitialized: true,
+}));
+
+// Ruta para cerrar sesión
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error al cerrar sesión:', err);
+      return res.status(500).send('Error al cerrar sesión');
+    }
+    res.redirect('/login'); // Redirige al login después de cerrar sesión
+  });
+});
+
+// Configuración del servidor
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);

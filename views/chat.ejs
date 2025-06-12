@@ -169,6 +169,24 @@
         font-size: 0.9rem;
       }
     }
+
+    .back-button {
+      padding: 10px 20px;
+      background-color: #6ec1e4; /* Azul claro */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(38, 70, 83, 0.2);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #5aa0c2; /* Azul más oscuro */
+      box-shadow: 0 6px 16px rgba(38, 70, 83, 0.4);
+    }
   </style>
 </head>
 <body>
@@ -191,6 +209,11 @@
       <input type="text" id="message" placeholder="Escribe tu mensaje..." required autocomplete="off" />
       <button type="submit">Enviar</button>
     </form>
+
+    <!-- Botón para regresar -->
+    <div style="text-align: center; margin-top: 20px;">
+      <button onclick="window.history.back()" class="back-button">🔙 Regresar</button>
+    </div>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>

@@ -59,6 +59,28 @@ router.get('/dashboard', async (req, res) => {
   }
 });
 
+router.get('/dashboard_veterinario', async (req, res) => {
+  try {
+    const userId = req.session.userId; // Obtén el ID del usuario desde la sesión
+    const pool = await poolPromise;
+
+    // Consulta para obtener los datos del veterinario
+    const result = await pool.request()
+      .input('id', sql.Int, userId)
+      .query('SELECT * FROM Usuarios WHERE id = @id AND rol = \'veterinario\'');
+
+    if (result.recordset.length > 0) {
+      const vet = result.recordset[0];
+      res.render('dashboard_veterinario', { vet });
+    } else {
+      res.status(404).send('Veterinario no encontrado');
+    }
+  } catch (err) {
+    console.error('Error al obtener los datos del veterinario:', err);
+    res.status(500).send('Error interno del servidor');
+  }
+});
+
 router.get('/chat/:clienteId', async (req, res) => {
   if (!req.session.user || req.session.user.rol !== 'veterinario') {
     return res.redirect('/login');

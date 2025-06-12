@@ -42,7 +42,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/register', (req, res) => {
-  res.render('register'); // Asegúrate de tener views/register.ejs
+  res.render('register'); 
 });
 
 router.post('/register', async (req, res) => {
@@ -66,7 +66,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Paso 1: Recibe el correo y muestra la pregunta (puedes hacerlo con AJAX o en dos pasos)
+
 router.post('/recuperar-contrasenia', async (req, res) => {
   const { email } = req.body;
   const pool = await poolPromise;
@@ -76,7 +76,7 @@ router.post('/recuperar-contrasenia', async (req, res) => {
   if (result.recordset.length === 0) {
     return res.send('Correo no encontrado');
   }
-  // Puedes renderizar la pregunta o devolverla por JSON si usas AJAX
+
   res.json({ pregunta: result.recordset[0].pregunta_seguridad });
 });
 

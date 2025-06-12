@@ -115,6 +115,53 @@
     border-bottom: 2px solid #0f75bc;
   }
 
+  /* Modal styles */
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-align: center;
+  }
+
+  .modal-content p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .modal-button {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .modal-button.confirm {
+    background: #6ec1e4;
+    color: white;
+  }
+
+  .modal-button.cancel {
+    background: #e63946;
+    color: white;
+  }
+
+  .modal-button:hover {
+    opacity: 0.9;
+  }
+
   /* Responsive */
   @media (max-width: 900px) {
     .scheduling-container {
@@ -170,6 +217,17 @@
 
 <a href="/citas" class="back-link" aria-label="Volver a la lista de citas">← Volver</a>
 
+<!-- Modal para confirmación de edición -->
+<div id="editModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <p>¿Estás seguro de realizar la acciòn?</p>
+    <div class="modal-actions">
+      <button id="confirmEdit" class="modal-button confirm">Sí</button>
+      <button id="cancelEdit" class="modal-button cancel">No</button>
+    </div>
+  </div>
+</div>
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
@@ -195,5 +253,19 @@
       }
     });
     calendar.render();
+  });
+
+  document.querySelector('.appointment-form').addEventListener('submit', function (event) {
+    event.preventDefault(); // Detener el envío del formulario
+    document.getElementById('editModal').style.display = 'block'; // Mostrar el modal
+  });
+
+  document.getElementById('confirmEdit').addEventListener('click', function () {
+    document.querySelector('.appointment-form').submit(); // Enviar el formulario si se confirma
+    document.getElementById('editModal').style.display = 'none'; // Ocultar el modal
+  });
+
+  document.getElementById('cancelEdit').addEventListener('click', function () {
+    document.getElementById('editModal').style.display = 'none'; // Ocultar el modal si se cancela
   });
 </script>

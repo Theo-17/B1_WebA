@@ -249,19 +249,49 @@ router.get('/agendar/:id', async (req, res) => {
 });
 
 router.post('/agendar/:id', async (req, res) => {
-  const { fecha, motivo, id_veterinario } = req.body;
+  const { fecha, motivo, id_veterinario, nombre_mascota, especie, raza, fecha_nacimiento } = req.body;
   const fechaValida = new Date(fecha);
+
   if (isNaN(fechaValida.getTime())) {
     return res.send('Fecha inválida');
   }
-  const pool = await poolPromise;
-  await pool.request()
-    .input('id', sql.Int, req.params.id)
-    .input('fecha', sql.DateTime, fechaValida)
-    .input('motivo', sql.NVarChar, motivo)
-    .input('id_veterinario', sql.Int, id_veterinario)
-    .query('UPDATE Citas SET fecha = @fecha, motivo = @motivo, id_veterinario = @id_veterinario WHERE id = @id');
-  res.redirect('/citas/mis-citas');
+
+  try {
+    const pool = await poolPromise;
+
+    // Actualizar los datos de la cita
+    await pool.request()
+      .input('id', sql.Int, req.params.id)
+      .input('fecha', sql.DateTime, fechaValida)
+      .input('motivo', sql.NVarChar, motivo)
+      .input('id_veterinario', sql.Int, id_veterinario)
+      .query('UPDATE Citas SET fecha = @fecha, motivo = @motivo, id_veterinario = @id_veterinario WHERE id = @id');
+
+    // Obtener el ID de la mascota asociada a la cita
+    const mascotaResult = await pool.request()
+      .input('id', sql.Int, req.params.id)
+      .query('SELECT id_mascota FROM Citas WHERE id = @id');
+
+    const idMascota = mascotaResult.recordset[0].id_mascota;
+
+    // Actualizar los datos de la mascota
+    await pool.request()
+      .input('id', sql.Int, idMascota)
+      .input('nombre', sql.VarChar(100), nombre_mascota)
+      .input('especie', sql.VarChar(50), especie)
+      .input('raza', sql.VarChar(50), raza || null)
+      .input('fecha_nacimiento', sql.Date, fecha_nacimiento || null)
+      .query(`
+        UPDATE Mascotas 
+        SET nombre = @nombre, especie = @especie, raza = @raza, fecha_nacimiento = @fecha_nacimiento 
+        WHERE id = @id
+      `);
+
+    res.redirect('/citas/mis-citas');
+  } catch (err) {
+    console.error('Error al editar la cita:', err);
+    res.send('Error al editar la cita');
+  }
 });
 
 module.exports = router;

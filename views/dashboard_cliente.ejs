@@ -151,11 +151,29 @@
       font-style: italic;
       color: #666;
     }
+
+    .logout-button {
+      background: #e63946;
+      color: white;
+      text-decoration: none;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+
+    .logout-button:hover {
+      background: #c53030;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>¡Hola, <%= user.nombre %>!</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h1>¡Hola, <%= user.nombre %>!</h1>
+      <a href="/logout" class="logout-button">🚪 Cerrar sesión</a>
+    </div>
+
     <div class="welcome-text">¡Qué bueno verte por aquí!</div>
 
     <div class="promo-text">
