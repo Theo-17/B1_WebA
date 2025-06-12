@@ -1,0 +1,92 @@
+<link rel="stylesheet" href="/css/style.css">
+
+<div class="login-container">
+  <h1 class="app-title">🐾 PatPets</h1>
+  <form id="recuperar-form" method="POST" action="/recuperar-contrasenia">
+    <label for="email">Correo electrónico</label>
+    <input id="email" name="email" type="email" placeholder="Correo electrónico" required>
+    <button type="submit">Siguiente</button>
+  </form>
+</div>
+
+<!-- Modal para pregunta de seguridad -->
+<div id="modal-pregunta" class="modal" style="display:none;">
+  <div class="modal-content">
+    <form id="pregunta-form" method="POST" action="/verificar-pregunta">
+      <input type="hidden" id="email_modal" name="email" />
+      <label for="pregunta_seguridad">Selecciona tu pregunta de seguridad</label>
+      <select id="pregunta_seguridad" name="pregunta_seguridad" required>
+        <option value="">Selecciona una pregunta</option>
+        <option value="mascota">¿Cómo se llamaba tu primera mascota?</option>
+        <option value="escuela">¿Cuál es el nombre de tu escuela primaria?</option>
+        <option value="ciudad">¿En qué ciudad naciste?</option>
+        <option value="color">¿Cuál es tu color favorito?</option>
+      </select>
+      <label for="respuesta_seguridad">Respuesta</label>
+      <input id="respuesta_seguridad" name="respuesta_seguridad" type="text" placeholder="Respuesta" required>
+      <label for="nueva_password">Nueva contraseña</label>
+      <input id="nueva_password" name="nueva_password" type="password" placeholder="Nueva contraseña" required>
+      <button type="submit">Cambiar contraseña</button>
+    </form>
+  </div>
+</div>
+
+<div id="toast" style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#6EC1E4;color:#fff;padding:10px 24px;border-radius:8px;z-index:2000;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+  Usuario encontrado
+</div>
+
+<div id="toast-success" style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#4BB543;color:#fff;padding:10px 24px;border-radius:8px;z-index:2000;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+  Cambio de contraseña realizado con éxito
+</div>
+
+<div id="toast-error" style="display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#e74c3c;color:#fff;padding:10px 24px;border-radius:8px;z-index:2000;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+  Correo no encontrado
+</div>
+
+<script>
+document.getElementById('recuperar-form').onsubmit = async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const res = await fetch('/api/pregunta-seguridad?email=' + encodeURIComponent(email));
+  if (res.ok) {
+    // Mostrar toast de usuario encontrado
+    const toast = document.getElementById('toast');
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+      // Mostrar modal después del toast
+      document.getElementById('email_modal').value = email;
+      document.getElementById('modal-pregunta').style.display = 'flex';
+    }, 1000);
+  } else {
+    // Mostrar toast de error
+    const toastError = document.getElementById('toast-error');
+    toastError.style.display = 'block';
+    setTimeout(() => {
+      toastError.style.display = 'none';
+    }, 1000);
+  }
+};
+
+document.getElementById('pregunta-form').onsubmit = async function(e) {
+  e.preventDefault();
+  const form = e.target;
+  const formData = new FormData(form);
+  const res = await fetch('/verificar-pregunta', {
+    method: 'POST',
+    body: formData
+  });
+  const text = await res.text();
+  if (text.includes('Contraseña actualizada correctamente')) {
+    // Mostrar toast de éxito
+    const toast = document.getElementById('toast-success');
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+      window.location.href = '/login';
+    }, 1000);
+  } else {
+    alert(text); // Muestra el error si la respuesta no es éxito
+  }
+};
+</script>
