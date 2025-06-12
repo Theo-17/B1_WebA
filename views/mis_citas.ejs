@@ -1,106 +1,140 @@
-<h2>Mis Citas</h2>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mis Citas</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .citas-container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(110, 193, 228, 0.10);
+      max-width: 1000px;
+      margin: 3rem auto;
+    }
 
-<table border="1">
-  <thead>
-    <tr>
-      <th>Fecha</th>
-      <th>Motivo</th>
-      <th>Veterinario</th>
-      <th>Mascota</th>
-      <th>Estado</th>
-    </tr>
-  </thead>
-  <tbody>
+    .citas-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* siempre 3 columnas */
+      gap: 1.5rem;
+    }
+
+    /* Para pantallas medianas: 2 columnas */
+    @media (max-width: 900px) {
+      .citas-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Para pantallas pequeñas: 1 columna */
+    @media (max-width: 600px) {
+      .citas-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .cita-card {
+      background: #F6F8FC;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 1.2rem;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      box-shadow: 0 2px 12px rgba(110, 193, 228, 0.05);
+    }
+
+    .cita-card p {
+      margin: 0;
+      font-size: 0.97rem;
+    }
+
+    .estado-badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+      width: fit-content;
+    }
+
+    .estado-badge.pendiente {
+      background-color: #ffc107;
+      color: #000;
+    }
+
+    .estado-badge.confirmado {
+      background-color: #6EC1E4;
+      color: white;
+    }
+
+    .chat-button {
+      margin-top: 0.8rem;
+      background: linear-gradient(90deg, #6EC1E4 60%, #F9A826 100%);
+      color: white;
+      text-decoration: none;
+      padding: 0.6rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-align: center;
+      transition: background 0.3s ease;
+    }
+
+    .chat-button:hover {
+      background: linear-gradient(90deg, #F9A826 60%, #6EC1E4 100%);
+    }
+
+    .no-citas {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #6EC1E4;
+      margin: 2rem 0;
+    }
+
+    .volver-container {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .back-link {
+      color: #6EC1E4;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .back-link:hover {
+      color: #F9A826;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="citas-container">
+    <h2>Mis Citas</h2>
+
     <% if (citas.length === 0) { %>
-      <tr><td colspan="5">No tienes citas agendadas.</td></tr>
+      <div class="no-citas">No tienes citas agendadas.</div>
     <% } else { %>
-      <% citas.forEach(cita => { %>
-        <tr>
-          <td><%= new Date(cita.fecha)?.toLocaleString() %></td>
-          <td><%= cita.motivo %></td>
-          <td><%= cita.veterinario_nombre %></td>
-          <td><%= cita.mascota_nombre %></td>
-          <td>
-            <span class="status-badge <%= cita.estado.toLowerCase() %>">
-              <%= cita.estado %>
-            </span>
-          </td>
-        </tr>
-      <% }) %>
+      <div class="citas-grid">
+        <% citas.forEach(cita => { %>
+          <div class="cita-card">
+            <p><strong>📅 Fecha:</strong> <%= new Date(cita.fecha)?.toLocaleString() %></p>
+            <p><strong>🎯 Motivo:</strong> <%= cita.motivo %></p>
+            <p><strong>👨‍⚕️ Veterinario:</strong> <%= cita.veterinario_nombre %></p>
+            <p><strong>🐾 Mascota:</strong> <%= cita.mascota_nombre %></p>
+            <span class="estado-badge <%= cita.estado.toLowerCase() %>"><%= cita.estado %></span>
+            <a class="chat-button" href="/chat/<%= cita.veterinario_id %>">💬 Chatear con Dr. <%= cita.veterinario_nombre %></a>
+          </div>
+        <% }) %>
+      </div>
     <% } %>
-  </tbody>
-</table>
 
-<div class="chat-links">
-  <% citas.forEach(cita => { %>
-    <div class="chat-link">
-      <a href="/chat/<%= cita.veterinario_id %>">Chatear con Dr. <%= cita.veterinario_nombre %></a>
+    <div class="volver-container">
+      <a href="/citas" class="back-link">🔙 Volver</a>
     </div>
-  <% }) %>
-</div>
-
-<a href="/citas" class="back-link">Volver</a>
-
-<style>
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-
-  th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-
-  th {
-    background-color: #f8f9fa;
-    font-weight: bold;
-  }
-
-  .status-badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  .status-badge.pendiente {
-    background-color: #ffc107;
-    color: #000;
-  }
-
-  .status-badge.confirmado {
-    background-color: #28a745;
-    color: #fff;
-  }
-
-  .chat-links {
-    margin-top: 20px;
-  }
-
-  .chat-link {
-    margin: 10px 0;
-  }
-
-  .chat-link a {
-    color: #007bff;
-    text-decoration: none;
-  }
-
-  .chat-link a:hover {
-    text-decoration: underline;
-  }
-
-  .back-link {
-    display: inline-block;
-    margin-top: 20px;
-    color: #007bff;
-    text-decoration: none;
-  }
-
-  .back-link:hover {
-    text-decoration: underline;
-  }
-</style>
+  </div>
+</body>
+</html>
