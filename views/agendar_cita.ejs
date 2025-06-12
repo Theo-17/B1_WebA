@@ -133,38 +133,38 @@
 <div class="scheduling-container" role="main" aria-label="Agendar cita veterinaria">
   <div id="calendar" aria-label="Calendario de citas disponibles"></div>
 
-  <form action="/citas/agendar" method="POST" class="appointment-form" aria-describedby="form-desc" novalidate>
+  <form action="<%= cita ? '/citas/agendar/' + cita.id : '/citas/agendar' %>" method="POST" class="appointment-form" aria-describedby="form-desc" novalidate>
     <p id="form-desc" style="font-size:0.9rem; color:#666; margin-bottom:1rem; user-select:none;">
       Completa el formulario para agendar la cita con tu mascota.
     </p>
 
     <label for="nombre_mascota">Nombre Mascota:</label>
-    <input type="text" id="nombre_mascota" name="nombre_mascota" placeholder="Ej: Rocky" required autocomplete="off" />
+    <input type="text" id="nombre_mascota" name="nombre_mascota" placeholder="Ej: Rocky" value="<%= cita ? cita.nombre_mascota : '' %>" required autocomplete="off" />
 
     <label for="especie">Especie:</label>
-    <input type="text" id="especie" name="especie" placeholder="Ej: Perro, Gato" required autocomplete="off" />
+    <input type="text" id="especie" name="especie" placeholder="Ej: Perro, Gato" value="<%= cita ? cita.especie : '' %>" required autocomplete="off" />
 
     <label for="raza">Raza:</label>
-    <input type="text" id="raza" name="raza" placeholder="Opcional" autocomplete="off" />
+    <input type="text" id="raza" name="raza" placeholder="Opcional" value="<%= cita ? cita.raza : '' %>" autocomplete="off" />
 
     <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
-    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" />
+    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<%= cita && cita.fecha_nacimiento ? cita.fecha_nacimiento.toISOString().slice(0,10) : '' %>" />
 
     <label for="appointmentDateTime">Fecha y Hora de la Cita:</label>
-    <input type="datetime-local" id="appointmentDateTime" name="fecha" required aria-required="true" />
+    <input type="datetime-local" id="appointmentDateTime" name="fecha" value="<%= cita ? cita.fecha.toISOString().slice(0,16) : '' %>" required aria-required="true" />
 
     <label for="motivo">Motivo:</label>
-    <textarea id="motivo" name="motivo" placeholder="Describe brevemente el motivo" required></textarea>
+    <textarea id="motivo" name="motivo" placeholder="Describe brevemente el motivo" required><%= cita ? cita.motivo : '' %></textarea>
 
     <label for="veterinarioSelect">Veterinario:</label>
     <select id="veterinarioSelect" name="id_veterinario" required aria-required="true">
       <option value="" disabled selected>-- Seleccione un veterinario --</option>
       <% veterinarios.forEach(vet => { %>
-        <option value="<%= vet.id %>"><%= vet.nombre %></option>
+        <option value="<%= vet.id %>" <%= cita && cita.id_veterinario == vet.id ? 'selected' : '' %>><%= vet.nombre %></option>
       <% }) %>
     </select>
 
-    <button type="submit" aria-label="Enviar formulario para agendar cita">Agendar</button>
+    <button type="submit" aria-label="Enviar formulario para agendar cita"><%= cita ? 'Guardar cambios' : 'Agendar' %></button>
   </form>
 </div>
 

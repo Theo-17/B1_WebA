@@ -127,6 +127,10 @@
             <p><strong>🐾 Mascota:</strong> <%= cita.mascota_nombre %></p>
             <span class="estado-badge <%= cita.estado.toLowerCase() %>"><%= cita.estado %></span>
             <a class="chat-button" href="/chat/cliente/<%= cita.veterinario_id %>">💬 Chatear con Dr. <%= cita.veterinario_nombre %></a>
+            <div style="margin-top:0.7rem; display:flex; gap:0.5rem;">
+              <a href="/citas/agendar/<%= cita.id %>" class="chat-button" style="background:#40916c;">✏️ Editar</a>
+              <button onclick="eliminarCita('<%= cita.id %>')" class="chat-button" style="background:#e63946;">🗑️ Eliminar</button>
+            </div>
           </div>
         <% }) %>
       </div>
@@ -136,5 +140,25 @@
       <a href="/citas" class="back-link">🔙 Volver</a>
     </div>
   </div>
+
+  <script>
+  function eliminarCita(citaId) {
+    if (confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
+      fetch(`/citas/eliminar/${citaId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('Cita eliminada correctamente');
+          window.location.reload();
+        } else {
+          alert('No se pudo eliminar la cita');
+        }
+      });
+    }
+  }
+  </script>
 </body>
 </html>

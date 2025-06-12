@@ -17,19 +17,10 @@ router.get('/', async (req, res) => {
 
 // Formulario para agendar cita
 router.get('/agendar', async (req, res) => {
-    if (!req.session.user || req.session.user.rol !== 'cliente') return res.redirect('/login');
-    try {
-        const pool = await poolPromise;
-        // Traemos veterinarios para el select
-        const vetsResult = await pool.request()
-            .query(`SELECT id, nombre FROM Usuarios WHERE rol = 'veterinario'`);
-        const veterinarios = vetsResult.recordset;
-
-        res.render('agendar_cita', { veterinarios });
-    } catch (err) {
-        console.error(err);
-        res.send('Error al cargar datos');
-    }
+  const pool = await poolPromise;
+  const veterinarios = (await pool.request().query("SELECT id, nombre FROM Usuarios WHERE rol = 'veterinario'")).recordset;
+  // Aquí cita es null porque es para crear
+  res.render('agendar_cita', { cita: null, veterinarios });
 });
 
 router.get('/veterinario', async (req, res) => {
@@ -109,6 +100,7 @@ router.get('/mis-citas', async (req, res) => {
             .input('cliente_id', sql.Int, userId)
             .query(`
                 SELECT 
+                    Citas.id,                -- <--- AGREGA ESTA LÍNEA
                     Citas.fecha, 
                     Citas.motivo, 
                     Citas.estado,
@@ -226,5 +218,50 @@ router.get('/veterinario', async (req, res) => {
     }
 });
 
+router.post('/eliminar/:id', async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    console.log('Eliminando cita con id:', req.params.id); // <-- para debug
+    await pool.request()
+      .input('id', sql.Int, req.params.id)
+      .query('DELETE FROM Citas WHERE id = @id');
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false });
+  }
+});
+
+// Formulario para agendar cita con datos de la cita existente
+router.get('/agendar/:id', async (req, res) => {
+  const pool = await poolPromise;
+  const result = await pool.request()
+    .input('id', sql.Int, req.params.id)
+    .query(`
+      SELECT Citas.*, M.nombre AS nombre_mascota, M.especie, M.raza, M.fecha_nacimiento
+      FROM Citas
+      JOIN Mascotas M ON M.id = Citas.id_mascota
+      WHERE Citas.id = @id
+    `);
+  const cita = result.recordset[0];
+  const veterinarios = (await pool.request().query("SELECT id, nombre FROM Usuarios WHERE rol = 'veterinario'")).recordset;
+  res.render('agendar_cita', { cita, veterinarios });
+});
+
+router.post('/agendar/:id', async (req, res) => {
+  const { fecha, motivo, id_veterinario } = req.body;
+  const fechaValida = new Date(fecha);
+  if (isNaN(fechaValida.getTime())) {
+    return res.send('Fecha inválida');
+  }
+  const pool = await poolPromise;
+  await pool.request()
+    .input('id', sql.Int, req.params.id)
+    .input('fecha', sql.DateTime, fechaValida)
+    .input('motivo', sql.NVarChar, motivo)
+    .input('id_veterinario', sql.Int, id_veterinario)
+    .query('UPDATE Citas SET fecha = @fecha, motivo = @motivo, id_veterinario = @id_veterinario WHERE id = @id');
+  res.redirect('/citas/mis-citas');
+});
 
 module.exports = router;
