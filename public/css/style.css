@@ -1,0 +1,134 @@
+/* Fondo general */
+body {
+  background: #F6F8FC;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenedor del login */
+.login-container {
+  background: #FFF;
+  padding: 2.5rem 2rem 1.5rem 2rem;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(110, 193, 228, 0.10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 320px;
+  max-width: 350px;
+  gap: 1.2rem;
+}
+
+h2 {
+  text-align: center;
+  color: #6EC1E4;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.app-title {
+  color: #6EC1E4;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 1.2rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+/* Inputs */
+input[type="email"],
+input[type="password"],
+input[name="email"] {
+  padding: 0.8rem 1rem;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+  background: #F6F8FC;
+}
+
+input:focus {
+  border-color: #6EC1E4;
+}
+
+/* Botón */
+button[type="submit"] {
+  background: linear-gradient(90deg, #6EC1E4 60%, #F9A826 100%);
+  color: #FFF;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0 2px 8px rgba(249, 168, 38, 0.08);
+}
+
+button[type="submit"]:hover {
+  background: linear-gradient(90deg, #F9A826 60%, #6EC1E4 100%);
+  transform: translateY(-2px) scale(1.03);
+}
+
+/* Enlaces de login */
+.login-links {
+  margin-top: 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.98rem;
+}
+
+.login-links a {
+  color: #6EC1E4;
+  text-decoration: none;
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.login-links a:hover {
+  color: #F9A826;
+}
+
+.login-links span {
+  color: #E2E8F0;
+  font-size: 1.1em;
+}
+
+/* Opcional: icono de huella */
+h2::before {
+  content: "🐾 ";
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+/* Estilos para las etiquetas del formulario */
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem; /* Espacio uniforme entre todos los elementos */
+}
+
+form label {
+  margin-bottom: 0.1rem;
+  margin-top: 0.5rem;
+  color: #6EC1E4;
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+}
+
+form input[type="email"],
+form input[type="password"] {
+  margin-bottom: 0.2rem;
+}
