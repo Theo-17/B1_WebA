@@ -1,22 +1,190 @@
-<h1>Bienvenido, <%= user.nombre %></h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard Cliente</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f6f8fc;
+      color: #333;
+      margin: 0;
+      padding: 2.5rem;
+      display: flex;
+      justify-content: center;
+    }
 
-<p>¿Qué deseas hacer?</p>
+    .container {
+      max-width: 750px;
+      width: 100%;
+      background: white;
+      padding: 2rem 3rem;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(110, 193, 228, 0.3);
+      text-align: center;
+    }
 
-<a href="/citas/agendar"><button>Agendar nueva cita</button></a>
-<a href="/citas/mis-citas"><button>Ver mis citas</button></a>
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: #0f75bc;
+      margin-bottom: 0.2rem;
+    }
 
-<h3>Chatear con veterinarios:</h3>
-<div class="vet-list">
-  <% if (typeof veterinarios !== 'undefined' && veterinarios.length > 0) { %>
-    <% veterinarios.forEach(vet => { %>
-      <div class="vet-card">
-        <h4><%= vet.nombre %></h4>
-        <a href="/chat/cliente/<%= vet.id %>">
-          <button>Iniciar chat</button>
-        </a>
-      </div>
-    <% }) %>
-  <% } else { %>
-    <p>No hay veterinarios disponibles en este momento.</p>
-  <% } %>
-</div>
+    .welcome-text {
+      font-size: 1.25rem;
+      color: #0f75bc;
+      margin-bottom: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .promo-text {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 2.2rem;
+      line-height: 1.5;
+      font-style: italic;
+      background: #dff3ff;
+      border-left: 6px solid #6ec1e4;
+      padding: 1.1rem 1.7rem;
+      border-radius: 8px;
+      user-select: none;
+    }
+
+    p.accion-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0f75bc;
+      margin-bottom: 1.5rem;
+    }
+
+    .main-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .main-buttons a button {
+      background: linear-gradient(90deg, #6ec1e4 60%, #f9a826 100%);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      padding: 0.45rem 1.3rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(110, 193, 228, 0.6);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      min-width: 140px;
+    }
+
+    .main-buttons a button:hover {
+      background: linear-gradient(90deg, #f9a826 60%, #6ec1e4 100%);
+      box-shadow: 0 6px 18px rgba(249, 168, 38, 0.7);
+      transform: scale(1.05);
+    }
+
+    h3 {
+      font-size: 1.35rem;
+      color: #6ec1e4;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #6ec1e4;
+      padding-bottom: 0.3rem;
+      width: max-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .vet-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.1rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .vet-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(110, 193, 228, 0.3);
+      padding: 1rem 1.4rem;
+      width: 220px;
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+
+    .vet-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(249, 168, 38, 0.5);
+    }
+
+    .vet-card h4 {
+      margin: 0 0 1rem 0;
+      color: #0f75bc;
+    }
+
+    .vet-card button {
+      background: linear-gradient(90deg, #6ec1e4 60%, #f9a826 100%);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      padding: 0.4rem 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .vet-card button:hover {
+      background: linear-gradient(90deg, #f9a826 60%, #6ec1e4 100%);
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    p.no-vets {
+      font-style: italic;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>¡Hola, <%= user.nombre %>!</h1>
+    <div class="welcome-text">¡Qué bueno verte por aquí!</div>
+
+    <div class="promo-text">
+      En nuestra veterinaria, tu mascota recibe la atención profesional que merece, con especialistas dedicados y un trato lleno de cariño. Estamos aquí para cuidar la salud y felicidad de tu mejor amigo peludo.
+    </div>
+
+    <p class="accion-text">¿Qué deseas hacer hoy?</p>
+
+    <div class="main-buttons">
+      <a href="/citas/agendar"><button>Agendar nueva cita</button></a>
+      <a href="/citas/mis-citas"><button>Ver mis citas</button></a>
+    </div>
+
+    <h3>Comunícate en tiempo real con los especialistas que cuidan a tu mascota</h3>
+
+    <div class="vet-list">
+      <% if (typeof veterinarios !== 'undefined' && veterinarios.length > 0) { %>
+        <% veterinarios.forEach(vet => { %>
+          <div class="vet-card">
+            <h4><%= vet.nombre %></h4>
+            <a href="/chat/cliente/<%= vet.id %>">
+              <button>Iniciar chat</button>
+            </a>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p class="no-vets">No hay veterinarios disponibles en este momento.</p>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>
