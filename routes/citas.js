@@ -133,6 +133,7 @@ router.get('/get-appointments', async (req, res) => {
                 SELECT 
                     Citas.fecha,
                     Citas.motivo,
+                    Citas.estado,
                     M.nombre as mascota_nombre,
                     U.nombre as veterinario_nombre,
                     UC.nombre as cliente_nombre
@@ -140,17 +141,19 @@ router.get('/get-appointments', async (req, res) => {
                 JOIN Mascotas M ON Citas.id_mascota = M.id
                 JOIN Usuarios U ON Citas.id_veterinario = U.id
                 JOIN Usuarios UC ON Citas.cliente_id = UC.id
+                WHERE Citas.estado = 'Confirmado'
                 ORDER BY Citas.fecha ASC
             `);
 
         const events = result.recordset.map(cita => ({
             title: `${cita.mascota_nombre} - Dr. ${cita.veterinario_nombre}`,
             start: cita.fecha,
-            end: new Date(new Date(cita.fecha).getTime() + 30*60000), // 30 minute appointments
+            end: new Date(new Date(cita.fecha).getTime() + 30*60000),
             description: cita.motivo,
             extendedProps: {
                 cliente: cita.cliente_nombre,
-                veterinario: cita.veterinario_nombre
+                veterinario: cita.veterinario_nombre,
+                estado: cita.estado
             }
         }));
 
@@ -158,6 +161,60 @@ router.get('/get-appointments', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Error fetching appointments' });
+    }
+});
+
+router.post('/confirmar/:citaId', async (req, res) => {
+    if (!req.session.user || req.session.user.rol !== 'veterinario') {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    try {
+        const pool = await poolPromise;
+        await pool.request()
+            .input('citaId', sql.Int, req.params.citaId)
+            .input('veterinarioId', sql.Int, req.session.user.id)
+            .query(`
+                UPDATE Citas 
+                SET estado = 'Confirmado'
+                WHERE id = @citaId 
+                AND id_veterinario = @veterinarioId
+            `);
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error al confirmar la cita' });
+    }
+});
+
+router.get('/veterinario', async (req, res) => {
+    if (!req.session.user || req.session.user.rol !== 'veterinario') return res.redirect('/login');
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('veterinarioId', sql.Int, req.session.user.id)
+            .query(`
+                SELECT 
+                    Citas.id,
+                    Citas.fecha, 
+                    Citas.motivo, 
+                    Citas.estado,
+                    U.nombre AS cliente_nombre,
+                    M.nombre AS mascota_nombre
+                FROM Citas
+                JOIN Usuarios U ON U.id = Citas.cliente_id
+                JOIN Mascotas M ON M.id = Citas.id_mascota
+                WHERE Citas.id_veterinario = @veterinarioId
+                ORDER BY Citas.fecha ASC
+            `);
+        res.render('dashboard_veterinario', { 
+            user: req.session.user, 
+            citas: result.recordset 
+        });
+    } catch (err) {
+        console.error(err);
+        res.send('Error al cargar citas');
     }
 });
 
