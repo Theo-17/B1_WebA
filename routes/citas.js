@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
     if (!req.session.user || req.session.user.rol !== 'cliente') return res.redirect('/login');
 
     const pool = await poolPromise;
-        // Traemos veterinarios para el select
+    // Traemos veterinarios para el select
     const vetsResult = await pool.request()
         .query(`SELECT id, nombre FROM Usuarios WHERE rol = 'veterinario'`);
     const veterinarios = vetsResult.recordset;
@@ -109,16 +109,55 @@ router.get('/mis-citas', async (req, res) => {
             .input('cliente_id', sql.Int, userId)
             .query(`
         SELECT Citas.fecha, Citas.motivo, U.nombre AS veterinario_nombre, U.id AS veterinario_id, M.nombre AS mascota_nombre
-FROM Citas
-JOIN Usuarios U ON U.id = Citas.id_veterinario
-JOIN Mascotas M ON M.id = Citas.id_mascota
-WHERE Citas.cliente_id = @cliente_id
-ORDER BY Citas.fecha DESC
+    FROM Citas
+    JOIN Usuarios U ON U.id = Citas.id_veterinario
+    JOIN Mascotas M ON M.id = Citas.id_mascota
+    WHERE Citas.cliente_id = @cliente_id
+    ORDER BY Citas.fecha DESC
       `);
         res.render('mis_citas', { citas: result.recordset });
     } catch (err) {
         console.error(err);
         res.send('Error al cargar sus citas');
+    }
+});
+
+// Add this new route after the existing routes
+router.get('/get-appointments', async (req, res) => {
+    if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
+    
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .query(`
+                SELECT 
+                    Citas.fecha,
+                    Citas.motivo,
+                    M.nombre as mascota_nombre,
+                    U.nombre as veterinario_nombre,
+                    UC.nombre as cliente_nombre
+                FROM Citas
+                JOIN Mascotas M ON Citas.id_mascota = M.id
+                JOIN Usuarios U ON Citas.id_veterinario = U.id
+                JOIN Usuarios UC ON Citas.cliente_id = UC.id
+                ORDER BY Citas.fecha ASC
+            `);
+
+        const events = result.recordset.map(cita => ({
+            title: `${cita.mascota_nombre} - Dr. ${cita.veterinario_nombre}`,
+            start: cita.fecha,
+            end: new Date(new Date(cita.fecha).getTime() + 30*60000), // 30 minute appointments
+            description: cita.motivo,
+            extendedProps: {
+                cliente: cita.cliente_nombre,
+                veterinario: cita.veterinario_nombre
+            }
+        }));
+
+        res.json(events);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error fetching appointments' });
     }
 });
 

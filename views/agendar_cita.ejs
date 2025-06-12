@@ -1,33 +1,145 @@
 <h2>Agendar Cita</h2>
 
-<form action="/citas/agendar" method="POST">
-  <label>Nombre Mascota:</label>
-  <input type="text" name="nombre_mascota" required>
+<!-- Add FullCalendar CSS and JS -->
+<link href='https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.css' rel='stylesheet' />
+<link href='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/interaction/main.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+<style>
+  /* Add some basic styling for the calendar */
+  #calendar {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+  }
+</style>
 
-  <label>Especie:</label>
-  <input type="text" name="especie" required>
+<div class="scheduling-container">
+  <!-- Calendar will be displayed here -->
+  <div id="calendar"></div>
 
-  <label>Raza:</label>
-  <input type="text" name="raza">
+  <!-- Appointment form -->
+  <form action="/citas/agendar" method="POST" class="appointment-form">
+    <label>Nombre Mascota:</label>
+    <input type="text" name="nombre_mascota" required>
 
-  <label>Fecha de Nacimiento:</label>
-  <input type="date" name="fecha_nacimiento">
+    <label>Especie:</label>
+    <input type="text" name="especie" required>
 
-  <label>Fecha y Hora de la Cita:</label>
-  <input type="datetime-local" name="fecha" required>
+    <label>Raza:</label>
+    <input type="text" name="raza">
 
-  <label>Motivo:</label>
-  <textarea name="motivo" required></textarea>
+    <label>Fecha de Nacimiento:</label>
+    <input type="date" name="fecha_nacimiento">
 
-  <label>Veterinario:</label>
-  <select name="id_veterinario" required>
-    <option value="">-- Seleccione un veterinario --</option>
-    <% veterinarios.forEach(vet => { %>
-      <option value="<%= vet.id %>"><%= vet.nombre %></option>
-    <% }) %>
-  </select>
+    <label>Fecha y Hora de la Cita:</label>
+    <input type="datetime-local" name="fecha" id="appointmentDateTime" required>
 
-  <button type="submit">Agendar</button>
-</form>
+    <label>Motivo:</label>
+    <textarea name="motivo" required></textarea>
 
-<a href="/citas">Volver</a>
+    <label>Veterinario:</label>
+    <select name="id_veterinario" id="veterinarioSelect" required>
+      <option value="">-- Seleccione un veterinario --</option>
+      <% veterinarios.forEach(vet => { %>
+        <option value="<%= vet.id %>"><%= vet.nombre %></option>
+      <% }) %>
+    </select>
+
+    <button type="submit">Agendar</button>
+  </form>
+</div>
+
+<a href="/citas" class="back-link">Volver</a>
+
+<style>
+  .scheduling-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  #calendar {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .appointment-form {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .appointment-form label {
+    font-weight: bold;
+  }
+
+  .appointment-form input,
+  .appointment-form select,
+  .appointment-form textarea {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  .appointment-form button {
+    background: #007bff;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .appointment-form button:hover {
+    background: #0056b3;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 1rem;
+    margin-left: 1rem;
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      selectable: true,
+      selectMirror: true,
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,dayGridWeek'
+      },
+      events: '/citas/get-appointments',
+      eventDidMount: function(info) {
+        // Add tooltip with extended information
+        info.el.title = `${info.event.title}\nCliente: ${info.event.extendedProps.cliente}\nMotivo: ${info.event.description}`;
+      },
+      select: function(info) {
+        document.getElementById('appointmentDateTime').value = info.startStr + 'T09:00';
+      }
+    });
+    calendar.render();
+  });
+</script>
