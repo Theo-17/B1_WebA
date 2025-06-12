@@ -1,0 +1,79 @@
+workspace {
+
+    model {
+        user = person "User" {
+            description "A user of the system."
+        }
+
+        softwareSystem = softwareSystem "B1_WebA System" {
+            description "The main system for B1_WebA."
+
+            webapp = container "Web Application" {
+                description "The main web application."
+                technology "Node.js and Express"
+
+                user -> this "Uses"
+
+                appJs = component "app.js" {
+                    description "Main application entry point."
+                    technology "JavaScript"
+                }
+
+                views = component "Views" {
+                    description "EJS templates for rendering HTML pages."
+                    technology "EJS"
+                }
+
+                routes = component "Routes" {
+                    description "Defines server routes."
+                    technology "JavaScript"
+                }
+
+                scripts = component "Scripts" {
+                    description "SQL scripts for database management."
+                    technology "SQL"
+                }
+
+                publicAssets = component "Public Assets" {
+                    description "Static assets like CSS and JavaScript."
+                    technology "Static files"
+                }
+
+                database = component "Database" {
+                    description "Database connection and configuration."
+                    technology "JavaScript"
+                }
+
+                appJs -> views "Renders"
+                appJs -> routes "Handles"
+                appJs -> scripts "Executes"
+                appJs -> publicAssets "Serves"
+                appJs -> database "Connects to"
+
+                routes -> database "Queries"
+                routes -> views "Renders"
+                scripts -> database "Modifies"
+                publicAssets -> views "Includes"
+            }
+        }
+    }
+
+    views {
+        systemContext softwareSystem {
+            include *
+            autolayout lr
+        }
+
+        container softwareSystem {
+            include *
+            autolayout lr
+        }
+
+        component webapp {
+            include *
+            autolayout lr
+        }
+
+        theme default
+    }
+}
