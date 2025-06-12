@@ -45,6 +45,7 @@ h2 {
 /* Inputs */
 input[type="email"],
 input[type="password"],
+input[type="text"],
 input[name="email"] {
   padding: 0.8rem 1rem;
   border: 1.5px solid #E2E8F0;
@@ -112,6 +113,15 @@ h2::before {
 }
 
 /* Estilos para las etiquetas del formulario */
+form label {
+  font-size: 1rem;
+  color: #6EC1E4;
+  margin-bottom: 0.2rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
 form {
   width: 100%;
   display: flex;
@@ -119,16 +129,26 @@ form {
   gap: 0.7rem; /* Espacio uniforme entre todos los elementos */
 }
 
-form label {
-  margin-bottom: 0.1rem;
-  margin-top: 0.5rem;
-  color: #6EC1E4;
-  font-weight: 500;
-  font-size: 1rem;
-  letter-spacing: 0.5px;
+form input[type="email"],
+form input[type="password"],
+form input[type="text"],
+form select {
+  width: 100%;
+  box-sizing: border-box;
 }
 
-form input[type="email"],
-form input[type="password"] {
+form select {
+  padding: 0.8rem 1rem;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #F6F8FC;
+  color: #333;
   margin-bottom: 0.2rem;
+  outline: none;
+  transition: border 0.2s;
+}
+
+form select:focus {
+  border-color: #6EC1E4;
 }

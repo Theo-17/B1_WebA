@@ -37,24 +37,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/register', (req, res) => {
-  res.render('register');
-});
-
-router.post('/register', async (req, res) => {
-  const { nombre, email, password, rol } = req.body;
-  try {
-    const pool = await poolPromise;
-    await pool.request()
-      .input('nombre', nombre)
-      .input('email', email)
-      .input('password', password)
-      .input('rol', rol)
-      .query('INSERT INTO Usuarios (nombre, email, password, rol) VALUES (@nombre, @email, @password, @rol)');
-    res.redirect('/login');
-  } catch (err) {
-    console.error(err);
-    res.send('Error en el registro');
-  }
+  res.render('register'); // Asegúrate de tener views/register.ejs
 });
 
 module.exports = router;
