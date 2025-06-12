@@ -6,8 +6,8 @@
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f2f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f7f9; /* azul muy suave y fresco */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -20,7 +20,7 @@
       height: 90vh;
       background-color: #ffffff;
       border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 24px rgba(38, 70, 83, 0.2); /* sombra azul oscuro con transparencia */
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -28,20 +28,24 @@
 
     h2 {
       margin: 0;
-      background-color: #4a90e2;
+      background-color: #1b4965; /* azul profundo */
       color: white;
       padding: 18px 20px;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       text-align: center;
+      font-weight: 700;
+      text-shadow: 0 1px 3px rgba(27, 73, 101, 0.3);
     }
 
     .status {
       font-size: 0.9rem;
       padding: 10px 16px;
-      color: #4a90e2;
-      background-color: #e3f0ff;
-      border-bottom: 1px solid #dbe9f7;
+      color: #40916c; /* verde natural */
+      background-color: #d1e7dc; /* verde muy claro */
+      border-bottom: 1px solid #a7c4b5; /* verde suave */
       text-align: center;
+      font-weight: 600;
+      user-select: none;
     }
 
     .messages {
@@ -51,82 +55,119 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      background-color: #f2f5f9;
+      background-color: #f9fbfc; /* blanco muy suave */
     }
 
     .message {
       max-width: 75%;
-      padding: 12px 16px;
-      border-radius: 16px;
+      padding: 14px 18px;
+      border-radius: 20px;
       line-height: 1.4;
       font-size: 0.95rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      box-shadow: 0 3px 8px rgba(27, 73, 101, 0.12);
+      font-weight: 600;
     }
 
     .sent {
       align-self: flex-end;
-      background-color: #dcf8c6;
-      color: #333;
+      background-color: #2a9d8f; /* verde azulado */
+      color: #f0f7f9; /* blanco muy claro para contraste */
+      box-shadow: 0 5px 12px rgb(42 157 143 / 0.4);
+    }
+
+    .sent strong {
+      color: #a7d8cc; /* verde agua claro */
     }
 
     .received {
       align-self: flex-start;
       background-color: #ffffff;
-      color: #333;
+      color: #264653; /* azul oscuro */
+      box-shadow: 0 3px 10px rgb(38 70 83 / 0.2);
+    }
+
+    .received strong {
+      color: #40916c; /* verde natural */
     }
 
     .message strong {
       display: block;
-      font-size: 0.8rem;
-      margin-bottom: 4px;
-      color: #777;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
     }
 
     #chat-form {
       display: flex;
-      padding: 16px;
+      padding: 16px 20px;
       background-color: #ffffff;
-      border-top: 1px solid #dee2e6;
+      border-top: 1px solid #a7c4b5; /* verde suave */
+      box-shadow: inset 0 1px 3px rgb(27 73 101 / 0.1);
+      border-radius: 0 0 16px 16px;
     }
 
     #message {
       flex: 1;
-      padding: 10px 16px;
-      border: 1px solid #ced4da;
-      border-radius: 20px;
+      padding: 12px 20px;
+      border: 2px solid #a7c4b5; /* verde suave */
+      border-radius: 25px;
       outline: none;
       font-size: 1rem;
       background-color: #f9fbfc;
-      transition: border-color 0.3s;
+      transition: border-color 0.3s ease;
     }
 
     #message:focus {
-      border-color: #4a90e2;
+      border-color: #1b4965; /* azul profundo */
+      box-shadow: 0 0 8px #1b4965aa;
     }
 
     #chat-form button {
-      margin-left: 12px;
-      padding: 10px 20px;
-      background-color: #4a90e2;
+      margin-left: 14px;
+      padding: 12px 26px;
+      background-color: #e76f51; /* terracota cálido */
       color: white;
       border: none;
-      border-radius: 20px;
+      border-radius: 25px;
       cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s;
+      font-weight: 700;
+      font-size: 1rem;
+      box-shadow: 0 5px 15px rgb(231 111 81 / 0.5);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
     }
 
     #chat-form button:hover {
-      background-color: #357ab8;
+      background-color: #cc5f44;
+      box-shadow: 0 7px 20px rgb(204 95 68 / 0.7);
     }
 
     .messages::-webkit-scrollbar {
-      width: 6px;
+      width: 8px;
     }
 
     .messages::-webkit-scrollbar-thumb {
-      background-color: #ccc;
-      border-radius: 10px;
+      background-color: #a7c4b5;
+      border-radius: 12px;
+    }
+
+    .messages::-webkit-scrollbar-track {
+      background-color: #f0f7f9;
+    }
+
+    @media (max-width: 650px) {
+      .message {
+        max-width: 90%;
+        font-size: 0.9rem;
+      }
+
+      #chat-form {
+        padding: 14px 16px;
+      }
+
+      #chat-form button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
@@ -147,7 +188,7 @@
     </div>
 
     <form id="chat-form">
-      <input type="text" id="message" placeholder="Escribe tu mensaje..." required>
+      <input type="text" id="message" placeholder="Escribe tu mensaje..." required autocomplete="off" />
       <button type="submit">Enviar</button>
     </form>
   </div>
