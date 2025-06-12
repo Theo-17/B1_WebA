@@ -1,123 +1,174 @@
-<h2>Agendar Cita</h2>
+<h2 style="text-align:center; color:#0f75bc; font-weight: 700; font-family: 'Montserrat', sans-serif; margin-bottom: 1rem;">
+  Agendar Cita
+</h2>
 
-<!-- Add FullCalendar CSS and JS -->
+<!-- FullCalendar CSS y JS -->
 <link href='https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.css' rel='stylesheet' />
 <link href='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.css' rel='stylesheet' />
 <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.js'></script>
 <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.js'></script>
 <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/interaction/main.js'></script>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+
 <style>
-  /* Add some basic styling for the calendar */
-  #calendar {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 20px;
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #f9fbfd;
+    margin: 0;
+    padding: 2rem 1rem;
   }
-</style>
 
-<div class="scheduling-container">
-  <!-- Calendar will be displayed here -->
-  <div id="calendar"></div>
-
-  <!-- Appointment form -->
-  <form action="/citas/agendar" method="POST" class="appointment-form">
-    <label>Nombre Mascota:</label>
-    <input type="text" name="nombre_mascota" required>
-
-    <label>Especie:</label>
-    <input type="text" name="especie" required>
-
-    <label>Raza:</label>
-    <input type="text" name="raza">
-
-    <label>Fecha de Nacimiento:</label>
-    <input type="date" name="fecha_nacimiento">
-
-    <label>Fecha y Hora de la Cita:</label>
-    <input type="datetime-local" name="fecha" id="appointmentDateTime" required>
-
-    <label>Motivo:</label>
-    <textarea name="motivo" required></textarea>
-
-    <label>Veterinario:</label>
-    <select name="id_veterinario" id="veterinarioSelect" required>
-      <option value="">-- Seleccione un veterinario --</option>
-      <% veterinarios.forEach(vet => { %>
-        <option value="<%= vet.id %>"><%= vet.nombre %></option>
-      <% }) %>
-    </select>
-
-    <button type="submit">Agendar</button>
-  </form>
-</div>
-
-<a href="/citas" class="back-link">Volver</a>
-
-<style>
   .scheduling-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    padding: 1rem;
-    max-width: 1200px;
+    gap: 2.5rem;
+    max-width: 1100px;
     margin: 0 auto;
+    background: #fff;
+    padding: 2.5rem 3rem;
+    border-radius: 18px;
+    box-shadow: 0 14px 40px rgba(15, 117, 188, 0.15);
   }
 
   #calendar {
-    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(15, 117, 188, 0.1);
     padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: #ffffff;
+    max-width: 100%;
   }
 
   .appointment-form {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.3rem;
   }
 
   .appointment-form label {
-    font-weight: bold;
+    font-weight: 700;
+    color: #0f75bc;
+    font-size: 1rem;
+    user-select: none;
   }
 
   .appointment-form input,
   .appointment-form select,
   .appointment-form textarea {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 0.6rem 1rem;
+    border: 1.8px solid #c5d9ed;
+    border-radius: 10px;
+    font-size: 1rem;
+    color: #444;
+    transition: border-color 0.25s ease;
+    font-family: inherit;
+  }
+
+  .appointment-form input:focus,
+  .appointment-form select:focus,
+  .appointment-form textarea:focus {
+    outline: none;
+    border-color: #0f75bc;
+    box-shadow: 0 0 8px rgba(15, 117, 188, 0.3);
+  }
+
+  .appointment-form textarea {
+    min-height: 90px;
+    resize: vertical;
+    font-family: inherit;
   }
 
   .appointment-form button {
-    background: #007bff;
+    background: linear-gradient(90deg, #6ec1e4 60%, #f9a826 100%);
     color: white;
-    padding: 0.75rem;
+    font-weight: 800;
+    padding: 0.85rem 0;
     border: none;
-    border-radius: 4px;
+    border-radius: 14px;
+    font-size: 1.15rem;
     cursor: pointer;
+    box-shadow: 0 7px 20px rgba(110, 193, 228, 0.7);
+    transition: background 0.3s ease, transform 0.25s ease;
+    user-select: none;
   }
 
   .appointment-form button:hover {
-    background: #0056b3;
+    background: linear-gradient(90deg, #f9a826 60%, #6ec1e4 100%);
+    transform: scale(1.05);
+    box-shadow: 0 10px 28px rgba(249, 168, 38, 0.8);
   }
 
   .back-link {
     display: inline-block;
-    margin-top: 1rem;
-    margin-left: 1rem;
-    color: #007bff;
+    margin: 2rem auto 0;
+    color: #0f75bc;
+    font-weight: 700;
+    font-size: 1rem;
     text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s ease;
+    user-select: none;
+    max-width: 1100px;
+    padding-left: 1rem;
   }
 
   .back-link:hover {
-    text-decoration: underline;
+    border-bottom: 2px solid #0f75bc;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .scheduling-container {
+      grid-template-columns: 1fr;
+      padding: 2rem 1.5rem;
+    }
+
+    .back-link {
+      padding-left: 0;
+      text-align: center;
+      display: block;
+    }
   }
 </style>
+
+<div class="scheduling-container" role="main" aria-label="Agendar cita veterinaria">
+  <div id="calendar" aria-label="Calendario de citas disponibles"></div>
+
+  <form action="/citas/agendar" method="POST" class="appointment-form" aria-describedby="form-desc" novalidate>
+    <p id="form-desc" style="font-size:0.9rem; color:#666; margin-bottom:1rem; user-select:none;">
+      Completa el formulario para agendar la cita con tu mascota.
+    </p>
+
+    <label for="nombre_mascota">Nombre Mascota:</label>
+    <input type="text" id="nombre_mascota" name="nombre_mascota" placeholder="Ej: Rocky" required autocomplete="off" />
+
+    <label for="especie">Especie:</label>
+    <input type="text" id="especie" name="especie" placeholder="Ej: Perro, Gato" required autocomplete="off" />
+
+    <label for="raza">Raza:</label>
+    <input type="text" id="raza" name="raza" placeholder="Opcional" autocomplete="off" />
+
+    <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" />
+
+    <label for="appointmentDateTime">Fecha y Hora de la Cita:</label>
+    <input type="datetime-local" id="appointmentDateTime" name="fecha" required aria-required="true" />
+
+    <label for="motivo">Motivo:</label>
+    <textarea id="motivo" name="motivo" placeholder="Describe brevemente el motivo" required></textarea>
+
+    <label for="veterinarioSelect">Veterinario:</label>
+    <select id="veterinarioSelect" name="id_veterinario" required aria-required="true">
+      <option value="" disabled selected>-- Seleccione un veterinario --</option>
+      <% veterinarios.forEach(vet => { %>
+        <option value="<%= vet.id %>"><%= vet.nombre %></option>
+      <% }) %>
+    </select>
+
+    <button type="submit" aria-label="Enviar formulario para agendar cita">Agendar</button>
+  </form>
+</div>
+
+<a href="/citas" class="back-link" aria-label="Volver a la lista de citas">← Volver</a>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -133,11 +184,14 @@
       },
       events: '/citas/get-appointments',
       eventDidMount: function(info) {
-        // Add tooltip with extended information
         info.el.title = `${info.event.title}\nCliente: ${info.event.extendedProps.cliente}\nMotivo: ${info.event.description}`;
       },
       select: function(info) {
-        document.getElementById('appointmentDateTime').value = info.startStr + 'T09:00';
+        // Selecciona la fecha y pone hora por defecto 09:00 al input datetime-local
+        const dateStr = info.startStr; // yyyy-mm-dd
+        const defaultTime = 'T09:00';
+        document.getElementById('appointmentDateTime').value = dateStr + defaultTime;
+        document.getElementById('appointmentDateTime').focus();
       }
     });
     calendar.render();
