@@ -1,29 +1,151 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8" />
   <title>Chat</title>
-  <!-- ... existing styles ... -->
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f2f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 600px;
+      height: 90vh;
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    h2 {
+      margin: 0;
+      background-color: #4a90e2;
+      color: white;
+      padding: 18px 20px;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    .status {
+      font-size: 0.9rem;
+      padding: 10px 16px;
+      color: #4a90e2;
+      background-color: #e3f0ff;
+      border-bottom: 1px solid #dbe9f7;
+      text-align: center;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background-color: #f2f5f9;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      line-height: 1.4;
+      font-size: 0.95rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .sent {
+      align-self: flex-end;
+      background-color: #dcf8c6;
+      color: #333;
+    }
+
+    .received {
+      align-self: flex-start;
+      background-color: #ffffff;
+      color: #333;
+    }
+
+    .message strong {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+      color: #777;
+    }
+
+    #chat-form {
+      display: flex;
+      padding: 16px;
+      background-color: #ffffff;
+      border-top: 1px solid #dee2e6;
+    }
+
+    #message {
+      flex: 1;
+      padding: 10px 16px;
+      border: 1px solid #ced4da;
+      border-radius: 20px;
+      outline: none;
+      font-size: 1rem;
+      background-color: #f9fbfc;
+      transition: border-color 0.3s;
+    }
+
+    #message:focus {
+      border-color: #4a90e2;
+    }
+
+    #chat-form button {
+      margin-left: 12px;
+      padding: 10px 20px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    #chat-form button:hover {
+      background-color: #357ab8;
+    }
+
+    .messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .messages::-webkit-scrollbar-thumb {
+      background-color: #ccc;
+      border-radius: 10px;
+    }
+  </style>
 </head>
 <body>
   <div class="chat-container">
     <h2>Chat con <%= typeof otroUsuarioNombre !== 'undefined' ? otroUsuarioNombre : (user.rol === 'cliente' ? 'Veterinario' : 'Cliente') %></h2>
     <div id="connection-status" class="status">Conectando...</div>
+
     <div class="messages" id="messages">
       <% if (typeof mensajes !== 'undefined' && mensajes.length > 0) { %>
-
         <% mensajes.forEach(function(msg) { %>
           <div class="message <%= msg.id_emisor === user.id ? 'sent' : 'received' %>">
-            <% if (msg.id_emisor !== user.id) { %>
-              <strong><%= msg.emisor_nombre %>:</strong>
-            <% } else { %>
-              <strong>Tú:</strong>
-            <% } %>
+            <strong><%= msg.id_emisor === user.id ? 'Tú' : msg.emisor_nombre %>:</strong>
             <%= msg.mensaje %>
           </div>
         <% }); %>
-
       <% } %>
     </div>
+
     <form id="chat-form">
       <input type="text" id="message" placeholder="Escribe tu mensaje..." required>
       <button type="submit">Enviar</button>
@@ -39,29 +161,19 @@
     const userRole = '<%= user.rol %>';
     let currentSesionId = '<%= typeof sesionId !== "undefined" ? sesionId : "" %>';
 
-    // Determine who is veterinario and who is cliente based on role
     const veterinarioId = userRole === 'veterinario' ? userId : otroUsuarioId;
     const clienteId = userRole === 'cliente' ? userId : otroUsuarioId;
 
-    // Join chat room
-    socket.emit('join', {
-      userId,
-      veterinarioId,
-      clienteId
-    });
+    socket.emit('join', { userId, veterinarioId, clienteId });
 
-    // Handle session creation
     socket.on('session_created', (data) => {
       currentSesionId = data.sesionId;
-      console.log('Chat session created:', currentSesionId);
     });
 
-    // Handle message sending
     document.getElementById('chat-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const messageInput = document.getElementById('message');
       const msg = messageInput.value.trim();
-
       if (msg) {
         const messageData = {
           fromUserId: userId,
@@ -70,33 +182,26 @@
           msg: msg,
           sesionId: currentSesionId
         };
-
         socket.emit('chat message', messageData);
         messageInput.value = '';
       }
     });
 
-    // Handle incoming messages
     socket.on('chat message', (data) => {
-      if (!currentSesionId) {
-        currentSesionId = data.sesionId;
-      }
-      
+      if (!currentSesionId) currentSesionId = data.sesionId;
       const messagesDiv = document.getElementById('messages');
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${data.fromUserId === userId ? 'sent' : 'received'}`;
-      messageDiv.textContent = `${data.fromUserName}: ${data.msg}`;
+      messageDiv.innerHTML = `<strong>${data.fromUserId === userId ? 'Tú' : data.fromUserName}:</strong> ${data.msg}`;
       messagesDiv.appendChild(messageDiv);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     });
 
-    // Scroll to bottom on load
-    window.onload = function() {
+    window.onload = () => {
       const messagesDiv = document.getElementById('messages');
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     };
 
-    // Update connection status
     socket.on('connect', () => {
       document.getElementById('connection-status').textContent = 'Conectado';
     });
@@ -105,9 +210,7 @@
       document.getElementById('connection-status').textContent = 'Desconectado';
     });
 
-    // Handle errors
     socket.on('chat error', (error) => {
-      console.error('Chat error:', error.message);
       alert(error.message);
     });
   </script>
