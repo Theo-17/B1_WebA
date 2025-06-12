@@ -1,46 +1,108 @@
-<h2>Chat - <%= user.nombre %> (<%= user.rol %>)</h2>
-<ul id="mensajes"></ul>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat</title>
+  <!-- ... existing styles ... -->
+</head>
+<body>
+  <div class="chat-container">
+    <h2>Chat con <%= typeof otroUsuarioNombre !== 'undefined' ? otroUsuarioNombre : (user.rol === 'cliente' ? 'Veterinario' : 'Cliente') %></h2>
+    <div id="connection-status" class="status">Conectando...</div>
+    <div class="messages" id="messages">
+      <% if (typeof mensajes !== 'undefined' && mensajes.length > 0) { %>
+        <% mensajes.forEach(function(msg) { %>
+          <div class="message <%= msg.id_emisor === user.id ? 'sent' : 'received' %>">
+            <%= msg.emisor_nombre %>: <%= msg.mensaje %>
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
+    <form id="chat-form">
+      <input type="text" id="message" placeholder="Escribe tu mensaje..." required>
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
 
-<form id="formulario">
-  <input id="input" autocomplete="off" placeholder="Escribe algo..." /><button>Enviar</button>
-</form>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const userId = '<%= user.id %>';
+    const otroUsuarioId = '<%= otroUsuarioId %>';
+    const userName = '<%= user.nombre %>';
+    const userRole = '<%= user.rol %>';
+    let currentSesionId = '<%= typeof sesionId !== "undefined" ? sesionId : "" %>';
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-  const socket = io();
+    // Determine who is veterinario and who is cliente based on role
+    const veterinarioId = userRole === 'veterinario' ? userId : otroUsuarioId;
+    const clienteId = userRole === 'cliente' ? userId : otroUsuarioId;
 
-  const userId = <%- JSON.stringify(user.id) %>;
-  const userNombre = <%- JSON.stringify(user.nombre) %>;
-  const otroUsuarioId = <%- JSON.stringify(otroUsuarioId) %>;
-
-  const roomId = [userId, otroUsuarioId].sort().join('_');
-
-  socket.emit('join', { roomId, userId });
-
-  const form = document.getElementById('formulario');
-  const input = document.getElementById('input');
-  const mensajes = document.getElementById('mensajes');
-
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    if (!input.value.trim()) return;
-
-    socket.emit('chat message', {
-      roomId,
-      fromUserId: userId,
-      fromUserName: userNombre,
-      toUserId: otroUsuarioId,
-      msg: input.value.trim()
+    // Join chat room
+    socket.emit('join', {
+      userId,
+      veterinarioId,
+      clienteId
     });
 
-    input.value = '';
-  });
+    // Handle session creation
+    socket.on('session_created', (data) => {
+      currentSesionId = data.sesionId;
+      console.log('Chat session created:', currentSesionId);
+    });
 
-  socket.on('chat message', data => {
-    if (data.roomId === roomId) {
-      const item = document.createElement('li');
-      item.textContent = `${data.fromUserName}: ${data.msg}`;
-      mensajes.appendChild(item);
-    }
-  });
-</script>
+    // Handle message sending
+    document.getElementById('chat-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const messageInput = document.getElementById('message');
+      const msg = messageInput.value.trim();
+
+      if (msg) {
+        const messageData = {
+          fromUserId: userId,
+          toUserId: otroUsuarioId,
+          fromUserName: userName,
+          msg: msg,
+          sesionId: currentSesionId
+        };
+
+        socket.emit('chat message', messageData);
+        messageInput.value = '';
+      }
+    });
+
+    // Handle incoming messages
+    socket.on('chat message', (data) => {
+      if (!currentSesionId) {
+        currentSesionId = data.sesionId;
+      }
+      
+      const messagesDiv = document.getElementById('messages');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${data.fromUserId === userId ? 'sent' : 'received'}`;
+      messageDiv.textContent = `${data.fromUserName}: ${data.msg}`;
+      messagesDiv.appendChild(messageDiv);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+
+    // Scroll to bottom on load
+    window.onload = function() {
+      const messagesDiv = document.getElementById('messages');
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    };
+
+    // Update connection status
+    socket.on('connect', () => {
+      document.getElementById('connection-status').textContent = 'Conectado';
+    });
+
+    socket.on('disconnect', () => {
+      document.getElementById('connection-status').textContent = 'Desconectado';
+    });
+
+    // Handle errors
+    socket.on('chat error', (error) => {
+      console.error('Chat error:', error.message);
+      alert(error.message);
+    });
+  </script>
+</body>
+</html>

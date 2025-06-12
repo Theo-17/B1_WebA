@@ -15,7 +15,7 @@
     <% } else { %>
       <% citas.forEach(cita => { %>
         <tr>
-          <td><%= new Date(cita.fecha).toLocaleString() %></td>
+          <td><%= new Date(cita.fecha)?.toLocaleString() %></td>
           <td><%= cita.motivo %></td>
           <td><%= cita.veterinario_nombre %></td>
           <td><%= cita.mascota_nombre %></td>

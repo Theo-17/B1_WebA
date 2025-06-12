@@ -3,9 +3,16 @@ const router = express.Router();
 const { poolPromise } = require('../db/database');
 const sql = require('mssql');
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     if (!req.session.user || req.session.user.rol !== 'cliente') return res.redirect('/login');
-    res.render('dashboard_cliente', { user: req.session.user });
+
+    const pool = await poolPromise;
+        // Traemos veterinarios para el select
+    const vetsResult = await pool.request()
+        .query(`SELECT id, nombre FROM Usuarios WHERE rol = 'veterinario'`);
+    const veterinarios = vetsResult.recordset;
+
+    res.render('dashboard_cliente', { user: req.session.user, veterinarios });
 });
 
 // Formulario para agendar cita

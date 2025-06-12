@@ -4,3 +4,19 @@
 
 <a href="/citas/agendar"><button>Agendar nueva cita</button></a>
 <a href="/citas/mis-citas"><button>Ver mis citas</button></a>
+
+<h3>Chatear con veterinarios:</h3>
+<div class="vet-list">
+  <% if (typeof veterinarios !== 'undefined' && veterinarios.length > 0) { %>
+    <% veterinarios.forEach(vet => { %>
+      <div class="vet-card">
+        <h4><%= vet.nombre %></h4>
+        <a href="/chat/cliente/<%= vet.id %>">
+          <button>Iniciar chat</button>
+        </a>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <p>No hay veterinarios disponibles en este momento.</p>
+  <% } %>
+</div>

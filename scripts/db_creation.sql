@@ -106,3 +106,6 @@ GO
 
 ALTER TABLE Citas ADD cliente_id INT;
 ALTER TABLE Citas ADD CONSTRAINT FK_Citas_Cliente FOREIGN KEY (cliente_id) REFERENCES Usuarios(id);
+
+
+SELECT id, nombre FROM Usuarios WHERE rol = 'veterinario'

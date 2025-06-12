@@ -18,6 +18,7 @@ router.post('/login', async (req, res) => {
     const user = result.recordset[0];
     if (user) {
       req.session.user = user;
+      req.session.sesionId = Math.floor(Math.random() * 1000);
 
       if (user.rol === 'cliente') {
         res.redirect('/citas');
