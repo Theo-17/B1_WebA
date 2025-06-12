@@ -103,10 +103,20 @@ io.on('connection', socket => {
         `);
 
       // Send message to room with confirmed session ID
-      io.to(room).emit('chat message', {
-        ...data,
-        sesionId: chatSesionId
-      });
+      // Emitir al emisor con "Tú"
+        socket.emit('chat message', {
+          ...data,
+          fromUserName: 'Tú',
+          sesionId: chatSesionId
+        });
+
+        // Emitir al receptor con el nombre real del emisor
+        socket.to(room).emit('chat message', {
+          ...data,
+          fromUserName: data.fromUserName,
+          sesionId: chatSesionId
+        });
+
 
     } catch (err) {
       console.error('Error guardando mensaje:', err);

@@ -10,11 +10,18 @@
     <div id="connection-status" class="status">Conectando...</div>
     <div class="messages" id="messages">
       <% if (typeof mensajes !== 'undefined' && mensajes.length > 0) { %>
+
         <% mensajes.forEach(function(msg) { %>
           <div class="message <%= msg.id_emisor === user.id ? 'sent' : 'received' %>">
-            <%= msg.emisor_nombre %>: <%= msg.mensaje %>
+            <% if (msg.id_emisor !== user.id) { %>
+              <strong><%= msg.emisor_nombre %>:</strong>
+            <% } else { %>
+              <strong>Tú:</strong>
+            <% } %>
+            <%= msg.mensaje %>
           </div>
         <% }); %>
+
       <% } %>
     </div>
     <form id="chat-form">
