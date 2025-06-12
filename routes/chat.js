@@ -9,14 +9,13 @@ router.get('/', async (req, res) => {
   const sesionId = req.session.sesionId;
 
   if (user.rol === 'veterinario') {
-    // El veterinario puede tener un chat general o con lista
     const esVeterinario = true;
     res.render('chat', { 
       user, 
       esVeterinario, 
       veterinarioId: null, 
       sesionId,
-      otroUsuarioNombre: 'Cliente' // Default value
+      otroUsuarioNombre: 'Cliente'
     });
   } else if (user.rol === 'cliente') {
     try {
@@ -46,10 +45,26 @@ router.get('/cliente/:veterinarioId', async (req, res) => {
   try {
     const pool = await poolPromise;
     const user = req.session.user;
-    const veterinarioId = req.params.veterinarioId;
+    const veterinarioId = parseInt(req.params.veterinarioId);
     const clienteId = user.id;
 
-    // Get veterinario information and existing chat session
+    // Verificación de cita confirmada entre cliente y veterinario
+    const verificacion = await pool.request()
+      .input('clienteId', clienteId)
+      .input('veterinarioId', veterinarioId)
+      .query(`
+        SELECT COUNT(*) as total
+        FROM Citas
+        WHERE cliente_id = @clienteId
+          AND id_veterinario = @veterinarioId
+          AND estado = 'Confirmado'
+      `);
+
+    if (verificacion.recordset[0].total === 0) {
+      return res.redirect('/citas/mis-citas');
+    }
+
+    // Obtener información del veterinario y sesión de chat activa
     const veterinarioResult = await pool.request()
       .input('veterinarioId', veterinarioId)
       .input('clienteId', clienteId)
@@ -71,7 +86,6 @@ router.get('/cliente/:veterinarioId', async (req, res) => {
 
     const veterinario = veterinarioResult.recordset[0];
 
-    // Get existing messages if there's an active session
     let mensajes = [];
     if (veterinario.sesion_id) {
       const mensajesResult = await pool.request()
