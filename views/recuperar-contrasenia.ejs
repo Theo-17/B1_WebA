@@ -1,0 +1,162 @@
+<link rel="stylesheet" href="/css/style.css">
+
+<div class="login-container">
+  <h1 class="app-title">🐾 PatPets</h1>
+  <form id="recuperar-form" method="POST" action="/recuperar-contrasenia">
+    <label for="email">Correo electrónico</label>
+    <input id="email" name="email" type="email" placeholder="Correo electrónico" required>
+    <button type="submit">Siguiente</button>
+  </form>
+</div>
+
+<!-- Modal para pregunta de seguridad -->
+<div id="modal-pregunta" class="modal" style="display:none;">
+  <div class="modal-content">
+    <form id="pregunta-form">
+      <input type="hidden" id="email_modal" name="email" />
+      <label id="pregunta-label"></label>
+      <input id="respuesta_seguridad" name="respuesta_seguridad" type="text" placeholder="Respuesta" class="input-estilo" required>
+      <div id="cambiar-pass" style="display:none;">
+        <label for="nueva_password">Nueva contraseña</label>
+        <input id="nueva_password" name="nueva_password" type="password" placeholder="Nueva contraseña" required>
+        <button type="submit">Cambiar contraseña</button>
+      </div>
+      <button type="button" id="verificar-respuesta">Verificar respuesta</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para nueva contraseña -->
+<div id="modal-nueva-pass" class="modal" style="display:none;">
+  <div class="modal-content">
+    <form id="form-nueva-pass">
+      <input type="hidden" id="email_nueva" name="email" />
+      <input type="hidden" id="pregunta_nueva" name="pregunta" />
+      <input type="hidden" id="respuesta_nueva" name="respuesta" />
+      <label for="nueva_password_modal">Nueva contraseña</label>
+      <input id="nueva_password_modal" name="nueva_password" type="password" placeholder="Nueva contraseña" class="input-estilo" required>
+      <button type="submit">Cambiar contraseña</button>
+    </form>
+  </div>
+</div>
+
+<div id="toast" style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#6EC1E4;color:#fff;padding:10px 24px;border-radius:8px;z-index:2000;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+  Usuario encontrado
+</div>
+
+<div id="toast-success" style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#4BB543;color:#fff;padding:10px 24px;border-radius:8px;z-index:2000;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+  Cambio de contraseña realizado con éxito
+</div>
+
+<div id="toast-error" style="display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#e74c3c;color:#fff;padding:10px 24px;border-radius:8px;z-index:2000;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+  Correo no encontrado
+</div>
+
+<script>
+document.getElementById('recuperar-form').onsubmit = async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const res = await fetch('/api/pregunta-seguridad?email=' + encodeURIComponent(email));
+  if (res.ok) {
+    const data = await res.json();
+    document.getElementById('pregunta-label').textContent = data.pregunta;
+    document.getElementById('email_modal').value = email;
+    document.getElementById('modal-pregunta').style.display = 'flex';
+    document.getElementById('cambiar-pass').style.display = 'none';
+    document.getElementById('respuesta_seguridad').value = '';
+    document.getElementById('nueva_password').value = '';
+  } else {
+    const toastError = document.getElementById('toast-error');
+    toastError.style.display = 'block';
+    setTimeout(() => {
+      toastError.style.display = 'none';
+    }, 1000);
+  }
+};
+
+// Verificar respuesta antes de mostrar el campo de nueva contraseña
+document.getElementById('verificar-respuesta').onclick = async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('email_modal').value;
+  const respuesta = document.getElementById('respuesta_seguridad').value;
+  const pregunta = document.getElementById('pregunta-label').textContent;
+  const res = await fetch('/api/verificar-respuesta', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, pregunta, respuesta })
+  });
+  const data = await res.json();
+  if (data.correcta) {
+    // Llena los campos ocultos del nuevo modal
+    document.getElementById('email_nueva').value = email;
+    document.getElementById('pregunta_nueva').value = pregunta;
+    document.getElementById('respuesta_nueva').value = respuesta;
+    // Muestra el modal de nueva contraseña
+    document.getElementById('modal-nueva-pass').style.display = 'flex';
+    // Opcional: Oculta el modal anterior
+    document.getElementById('modal-pregunta').style.display = 'none';
+  } else {
+    // Puedes usar un toast aquí si quieres
+    alert('Respuesta incorrecta');
+  }
+};
+
+// Cambiar contraseña solo si la respuesta fue correcta
+document.getElementById('pregunta-form').onsubmit = async function(e) {
+  e.preventDefault();
+  if (document.getElementById('cambiar-pass').style.display !== 'block') return;
+  const email = document.getElementById('email_modal').value;
+  const pregunta = document.getElementById('pregunta-label').textContent;
+  const respuesta = document.getElementById('respuesta_seguridad').value;
+  const nueva_password = document.getElementById('nueva_password').value;
+  if (!nueva_password) {
+    alert('La contraseña no puede estar vacía');
+    return;
+  }
+  const res = await fetch('/verificar-pregunta', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, pregunta, respuesta, nueva_password })
+  });
+  const text = await res.text();
+  if (text.includes('Contraseña actualizada correctamente')) {
+    const toast = document.getElementById('toast-success');
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+      window.location.href = '/login';
+    }, 1000);
+  } else {
+    alert(text);
+  }
+};
+
+// Enviar nueva contraseña
+document.getElementById('form-nueva-pass').onsubmit = async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('email_nueva').value;
+  const pregunta = document.getElementById('pregunta_nueva').value;
+  const respuesta = document.getElementById('respuesta_nueva').value;
+  const nueva_password = document.getElementById('nueva_password_modal').value;
+  if (!nueva_password) {
+    alert('La contraseña no puede estar vacía');
+    return;
+  }
+  const res = await fetch('/verificar-pregunta', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, pregunta, respuesta, nueva_password })
+  });
+  const text = await res.text();
+  if (text.includes('Contraseña actualizada correctamente')) {
+    const toast = document.getElementById('toast-success');
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+      window.location.href = '/login';
+    }, 1000);
+  } else {
+    alert(text);
+  }
+};
+</script>

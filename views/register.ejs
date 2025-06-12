@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="/css/style.css">
-
+ 
 <div class="login-container">
   <h1 class="app-title">🐾 PatPets</h1>
   <form method="POST" action="/register">
@@ -14,6 +14,16 @@
       <option value="cliente">Cliente</option>
       <option value="veterinario">Veterinario</option>
     </select>
+    <label for="pregunta_seguridad">Pregunta de seguridad</label>
+    <select id="pregunta_seguridad" name="pregunta_seguridad" required>
+      <option value="">Selecciona una pregunta</option>
+      <option value="mascota">¿Cómo se llamaba tu primera mascota?</option>
+      <option value="escuela">¿Cuál es el nombre de tu escuela primaria?</option>
+      <option value="ciudad">¿En qué ciudad naciste?</option>
+      <option value="color">¿Cuál es tu color favorito?</option>
+    </select>
+    <label for="respuesta_seguridad">Respuesta</label>
+    <input id="respuesta_seguridad" name="respuesta_seguridad" type="text" placeholder="Respuesta" required>
     <button type="submit">Registrarse</button>
   </form>
   <div class="login-links">
