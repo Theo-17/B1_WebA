@@ -7,11 +7,12 @@
       <th>Motivo</th>
       <th>Veterinario</th>
       <th>Mascota</th>
+      <th>Estado</th>
     </tr>
   </thead>
   <tbody>
     <% if (citas.length === 0) { %>
-      <tr><td colspan="4">No tienes citas agendadas.</td></tr>
+      <tr><td colspan="5">No tienes citas agendadas.</td></tr>
     <% } else { %>
       <% citas.forEach(cita => { %>
         <tr>
@@ -19,19 +20,87 @@
           <td><%= cita.motivo %></td>
           <td><%= cita.veterinario_nombre %></td>
           <td><%= cita.mascota_nombre %></td>
+          <td>
+            <span class="status-badge <%= cita.estado.toLowerCase() %>">
+              <%= cita.estado %>
+            </span>
+          </td>
         </tr>
       <% }) %>
     <% } %>
   </tbody>
 </table>
 
-<ul>
+<div class="chat-links">
   <% citas.forEach(cita => { %>
-    <li>
-      Fecha: <%= cita.fecha %> - Veterinario: <%= cita.nombre_veterinario %>
-      <a href="/chat/<%= cita.veterinario_id %>">Chatear con veterinario</a>
-    </li>
+    <div class="chat-link">
+      <a href="/chat/<%= cita.veterinario_id %>">Chatear con Dr. <%= cita.veterinario_nombre %></a>
+    </div>
   <% }) %>
-</ul>
+</div>
 
-<a href="/citas">Volver</a>
+<a href="/citas" class="back-link">Volver</a>
+
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+  }
+
+  .status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .status-badge.pendiente {
+    background-color: #ffc107;
+    color: #000;
+  }
+
+  .status-badge.confirmado {
+    background-color: #28a745;
+    color: #fff;
+  }
+
+  .chat-links {
+    margin-top: 20px;
+  }
+
+  .chat-link {
+    margin: 10px 0;
+  }
+
+  .chat-link a {
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .chat-link a:hover {
+    text-decoration: underline;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+</style>

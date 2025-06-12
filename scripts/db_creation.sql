@@ -79,15 +79,6 @@ CREATE TABLE Tratamientos (
 );
 GO
 
-CREATE TABLE ChatMensajes (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    id_usuario INT NOT NULL,
-    mensaje TEXT NOT NULL,
-    fecha DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id)
-);
-GO
-
 -- Insertar un veterinario y un cliente para pruebas
 INSERT INTO Usuarios (email, password, nombre, rol) VALUES
 ('vet01', 'vetpass123', 'Dr. Juan Perez', 'veterinario'),

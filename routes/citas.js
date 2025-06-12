@@ -108,13 +108,19 @@ router.get('/mis-citas', async (req, res) => {
         const result = await pool.request()
             .input('cliente_id', sql.Int, userId)
             .query(`
-        SELECT Citas.fecha, Citas.motivo, U.nombre AS veterinario_nombre, U.id AS veterinario_id, M.nombre AS mascota_nombre
-    FROM Citas
-    JOIN Usuarios U ON U.id = Citas.id_veterinario
-    JOIN Mascotas M ON M.id = Citas.id_mascota
-    WHERE Citas.cliente_id = @cliente_id
-    ORDER BY Citas.fecha DESC
-      `);
+                SELECT 
+                    Citas.fecha, 
+                    Citas.motivo, 
+                    Citas.estado,
+                    U.nombre AS veterinario_nombre, 
+                    U.id AS veterinario_id, 
+                    M.nombre AS mascota_nombre
+                FROM Citas
+                JOIN Usuarios U ON U.id = Citas.id_veterinario
+                JOIN Mascotas M ON M.id = Citas.id_mascota
+                WHERE Citas.cliente_id = @cliente_id
+                ORDER BY Citas.fecha DESC
+            `);
         res.render('mis_citas', { citas: result.recordset });
     } catch (err) {
         console.error(err);
@@ -150,6 +156,9 @@ router.get('/get-appointments', async (req, res) => {
             start: cita.fecha,
             end: new Date(new Date(cita.fecha).getTime() + 30*60000),
             description: cita.motivo,
+            backgroundColor: '#28a745', // Green background for confirmed appointments
+            borderColor: '#218838',
+            textColor: '#ffffff',
             extendedProps: {
                 cliente: cita.cliente_nombre,
                 veterinario: cita.veterinario_nombre,
@@ -163,7 +172,6 @@ router.get('/get-appointments', async (req, res) => {
         res.status(500).json({ error: 'Error fetching appointments' });
     }
 });
-
 router.post('/confirmar/:citaId', async (req, res) => {
     if (!req.session.user || req.session.user.rol !== 'veterinario') {
         return res.status(401).json({ error: 'Unauthorized' });
