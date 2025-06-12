@@ -1,0 +1,37 @@
+<h2>Mis Citas</h2>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Motivo</th>
+      <th>Veterinario</th>
+      <th>Mascota</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (citas.length === 0) { %>
+      <tr><td colspan="4">No tienes citas agendadas.</td></tr>
+    <% } else { %>
+      <% citas.forEach(cita => { %>
+        <tr>
+          <td><%= new Date(cita.fecha).toLocaleString() %></td>
+          <td><%= cita.motivo %></td>
+          <td><%= cita.veterinario_nombre %></td>
+          <td><%= cita.mascota_nombre %></td>
+        </tr>
+      <% }) %>
+    <% } %>
+  </tbody>
+</table>
+
+<ul>
+  <% citas.forEach(cita => { %>
+    <li>
+      Fecha: <%= cita.fecha %> - Veterinario: <%= cita.nombre_veterinario %>
+      <a href="/chat/<%= cita.veterinario_id %>">Chatear con veterinario</a>
+    </li>
+  <% }) %>
+</ul>
+
+<a href="/citas">Volver</a>

@@ -1,0 +1,46 @@
+<h2>Chat - <%= user.nombre %> (<%= user.rol %>)</h2>
+<ul id="mensajes"></ul>
+
+<form id="formulario">
+  <input id="input" autocomplete="off" placeholder="Escribe algo..." /><button>Enviar</button>
+</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  const userId = <%- JSON.stringify(user.id) %>;
+  const userNombre = <%- JSON.stringify(user.nombre) %>;
+  const otroUsuarioId = <%- JSON.stringify(otroUsuarioId) %>;
+
+  const roomId = [userId, otroUsuarioId].sort().join('_');
+
+  socket.emit('join', { roomId, userId });
+
+  const form = document.getElementById('formulario');
+  const input = document.getElementById('input');
+  const mensajes = document.getElementById('mensajes');
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!input.value.trim()) return;
+
+    socket.emit('chat message', {
+      roomId,
+      fromUserId: userId,
+      fromUserName: userNombre,
+      toUserId: otroUsuarioId,
+      msg: input.value.trim()
+    });
+
+    input.value = '';
+  });
+
+  socket.on('chat message', data => {
+    if (data.roomId === roomId) {
+      const item = document.createElement('li');
+      item.textContent = `${data.fromUserName}: ${data.msg}`;
+      mensajes.appendChild(item);
+    }
+  });
+</script>

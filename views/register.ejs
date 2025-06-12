@@ -1,0 +1,12 @@
+<h2>Registro de Usuario</h2>
+<form method="POST" action="/register">
+  <input name="nombre" placeholder="Nombre completo" required>
+  <input name="email" placeholder="Correo electrónico" required>
+  <input name="password" type="password" placeholder="Contraseña" required>
+  <select name="rol" required>
+    <option value="cliente">Cliente</option>
+    <option value="veterinario">Veterinario</option>
+  </select>
+  <button type="submit">Registrarse</button>
+</form>
+<a href="/login">Iniciar sesión</a>

@@ -1,0 +1,24 @@
+<table>
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Cliente</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% citas.forEach(cita => { %>
+      <tr>
+        <td><%= cita.fecha.toLocaleString() %></td>
+        <td><%= cita.cliente_nombre %></td>
+        <td>
+          <button class="btn-chat" 
+            data-cliente-id="<%= cita.cliente_id %>" 
+            data-cliente-nombre="<%= cita.cliente_nombre %>">
+            Chatear con cliente
+          </button>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

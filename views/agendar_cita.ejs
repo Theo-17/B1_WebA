@@ -1,0 +1,33 @@
+<h2>Agendar Cita</h2>
+
+<form action="/citas/agendar" method="POST">
+  <label>Nombre Mascota:</label>
+  <input type="text" name="nombre_mascota" required>
+
+  <label>Especie:</label>
+  <input type="text" name="especie" required>
+
+  <label>Raza:</label>
+  <input type="text" name="raza">
+
+  <label>Fecha de Nacimiento:</label>
+  <input type="date" name="fecha_nacimiento">
+
+  <label>Fecha y Hora de la Cita:</label>
+  <input type="datetime-local" name="fecha" required>
+
+  <label>Motivo:</label>
+  <textarea name="motivo" required></textarea>
+
+  <label>Veterinario:</label>
+  <select name="id_veterinario" required>
+    <option value="">-- Seleccione un veterinario --</option>
+    <% veterinarios.forEach(vet => { %>
+      <option value="<%= vet.id %>"><%= vet.nombre %></option>
+    <% }) %>
+  </select>
+
+  <button type="submit">Agendar</button>
+</form>
+
+<a href="/citas">Volver</a>
