@@ -126,7 +126,7 @@
             <p><strong>👨‍⚕️ Veterinario:</strong> <%= cita.veterinario_nombre %></p>
             <p><strong>🐾 Mascota:</strong> <%= cita.mascota_nombre %></p>
             <span class="estado-badge <%= cita.estado.toLowerCase() %>"><%= cita.estado %></span>
-            <a class="chat-button" href="/chat/<%= cita.veterinario_id %>">💬 Chatear con Dr. <%= cita.veterinario_nombre %></a>
+            <a class="chat-button" href="/chat/cliente/<%= cita.veterinario_id %>">💬 Chatear con Dr. <%= cita.veterinario_nombre %></a>
           </div>
         <% }) %>
       </div>
